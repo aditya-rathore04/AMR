@@ -1,5 +1,6 @@
 import streamlit as st
 import joblib
+
 import pandas as pd
 
 # Load model
@@ -62,3 +63,12 @@ if st.button("Predict Resistance Risk"):
     prediction = model.predict(input_data)[0]
 
     st.success(f"Predicted Resistance: {prediction:.2f}%")
+    if prediction < 20:
+        risk = "Low Risk"
+        st.success(f"Risk Level: {risk}")
+    elif prediction < 40:
+        risk = "Medium Risk"
+        st.warning(f"Risk Level: {risk}")
+    else:
+        risk = "High Risk"
+        st.error(f"Risk Level: {risk}")
