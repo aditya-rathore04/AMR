@@ -261,43 +261,49 @@ function Dashboard() {
 
 
           {/* Antibiotic Comparison */}
-          <div style={{
+          <div
+            onClick={() => navigate("/antibiotic-analysis")}
+            style={{
             padding: "20px",
             borderRadius: "16px",
-            background: "#1e1e2f"
-          }}>
+            background: "#1e1e2f",
+            cursor:"pointer"
+            }}
+            >
 
             <h3>Antibiotic Comparison</h3>
 
             <div style={{marginTop:"15px"}}>
 
-              <div style={{marginBottom:"10px"}}>
-                <p>Ciprofloxacin</p>
-                <div style={{height:"10px", background:"#2a2f45", borderRadius:"10px"}}>
-                  <div style={{
-                    width:"32%",
-                    height:"100%",
-                    background:"#5b7cfa",
-                    borderRadius:"10px"
-                  }}></div>
-                </div>
-              </div>
+            <div style={{marginBottom:"10px"}}>
+            <p>Ciprofloxacin</p>
+            <div style={{height:"10px", background:"#2a2f45", borderRadius:"10px"}}>
+            <div style={{
+            width:"32%",
+            height:"100%",
+            background:"#5b7cfa",
+            borderRadius:"10px"
+            }}></div>
+            </div>
+            </div>
 
-              <div>
-                <p>Levofloxacin</p>
-                <div style={{height:"10px", background:"#2a2f45", borderRadius:"10px"}}>
-                  <div style={{
-                    width:"29%",
-                    height:"100%",
-                    background:"#8e94a8",
-                    borderRadius:"10px"
-                  }}></div>
-                </div>
-              </div>
+            <div>
+            <p>Levofloxacin</p>
+            <div style={{height:"10px", background:"#2a2f45", borderRadius:"10px"}}>
+            <div style={{
+            width:"29%",
+            height:"100%",
+            background:"#8e94a8",
+            borderRadius:"10px"
+            }}></div>
+            </div>
+            </div>
 
             </div>
 
-          </div>
+            
+
+            </div>
 
         </div>
 
