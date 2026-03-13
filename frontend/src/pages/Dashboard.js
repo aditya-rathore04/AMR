@@ -30,14 +30,20 @@ const navigate = useNavigate();
 const { year, country, specimen, antibiotic } = location.state || {};
 
 const [prediction, setPrediction] = useState(null);
+const [trendData, setTrendData] = useState([]);
 const [showFilters, setShowFilters] = useState(false);
 
 useEffect(() => {
 
 const fetchPrediction = async () => {
 
+const years = [2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+let predictions = [];
+
+for (let y of years){
+
 const result = await predictResistance({
-Year: year,
+Year: y,
 CountryTerritoryArea: country,
 Specimen: specimen,
 AntibioticName: antibiotic,
@@ -45,14 +51,18 @@ InterpretableAST: 200,
 PrevResistance: 30
 });
 
-setPrediction(result.predicted_resistance);
+predictions.push(result.predicted_resistance);
+
+}
+
+setPrediction(predictions[predictions.length-1]);
+setTrendData(predictions);
 
 };
 
 fetchPrediction();
 
 }, [year, country, specimen, antibiotic]);
-
 
 return (
 
@@ -81,9 +91,10 @@ background:"#5b7cfa",
 color:"white",
 cursor:"pointer"
 }}
+
 >
-Filter
-</button>
+
+Filter </button>
 
 {showFilters && (
 
@@ -94,22 +105,27 @@ animation:"slideIn 0.3s ease"
 }}>
 
 <select style={{padding:"8px", borderRadius:"10px"}}>
+
 <option>Region</option>
 </select>
 
 <select style={{padding:"8px", borderRadius:"10px"}}>
+
 <option>Country</option>
 </select>
 
 <select style={{padding:"8px", borderRadius:"10px"}}>
+
 <option>Specimen</option>
 </select>
 
 <select style={{padding:"8px", borderRadius:"10px"}}>
+
 <option>Antibiotic</option>
 </select>
 
 <select style={{padding:"8px", borderRadius:"10px"}}>
+
 <option>Year</option>
 </select>
 
@@ -120,8 +136,7 @@ border:"none",
 background:"#5b7cfa",
 color:"white"
 }}>
-Apply
-</button>
+Apply </button>
 
 </div>
 
@@ -131,7 +146,6 @@ Apply
 
 </div>
 
-
 {/* MAIN DASHBOARD GRID */}
 
 <div style={{
@@ -139,7 +153,6 @@ display:"grid",
 gridTemplateColumns:"1fr 2fr 1fr",
 gap:"20px"
 }}>
-
 
 {/* LEFT COLUMN */}
 
@@ -165,7 +178,6 @@ trends for early warning signals.
 </p>
 
 </div>
-
 
 {/* MAP CARD */}
 
@@ -199,16 +211,23 @@ Click to explore global resistance trends
 
 </div>
 
-
-
 {/* CENTER COLUMN */}
 
-<div style={{
+<div
+onClick={() =>
+navigate("/prediction-analysis", {
+state:{ year, country, specimen, antibiotic }
+})
+}
+style={{
 padding:"40px",
 borderRadius:"20px",
 background:"#1e1e2f",
-textAlign:"center"
-}}>
+textAlign:"center",
+cursor:"pointer",
+transition:"transform 0.2s"
+}}
+>
 
 <h3>Predicted Resistance Trend</h3>
 
@@ -226,7 +245,7 @@ labels:["2016","2017","2018","2019","2020","2021","2022","2023","2024","2025"],
 datasets:[
 {
 label:"Resistance %",
-data:[22,25,27,30,31,33,35,37,40, prediction || 42],
+data: trendData,
 borderColor:"#5b7cfa",
 backgroundColor:"rgba(91,124,250,0.2)",
 tension:0.4
@@ -248,8 +267,6 @@ y:{ticks:{color:"white"}}
 
 </div>
 
-
-
 {/* RIGHT COLUMN */}
 
 <div style={{
@@ -257,7 +274,6 @@ display:"flex",
 flexDirection:"column",
 gap:"20px"
 }}>
-
 
 {/* SPECIMEN CARD */}
 
@@ -300,8 +316,6 @@ borderRadius:"10px"
 </div>
 
 </div>
-
-
 
 {/* ANTIBIOTIC CARD */}
 
