@@ -33,6 +33,7 @@ padding:"40px"
 }}>
 
 {/* Header */}
+
 <div style={{
 display:"flex",
 justifyContent:"space-between",
@@ -69,39 +70,70 @@ Data
 </div>
 
 
-{/* Specimen bars */}
-
-<div style={{marginBottom:"40px"}}>
-
-<p>Bloodstream</p>
+{/* Specimen Bars */}
 
 <div style={{
-height:"18px",
+marginBottom:"40px",
+maxWidth:"900px",
+marginLeft:"auto",
+marginRight:"auto"
+}}>
+
+{/* Bloodstream */}
+
+<div style={{marginBottom:"20px"}}>
+
+<div style={{
+display:"flex",
+justifyContent:"space-between",
+marginBottom:"5px"
+}}>
+<p>Bloodstream</p>
+<p>41%</p>
+</div>
+
+<div style={{
+height:"16px",
 background:"#2a2f45",
-borderRadius:"20px",
-marginBottom:"20px"
+borderRadius:"20px"
 }}>
 <div style={{
-width:"36%",
+width:"41%",
 height:"100%",
 background:"#5b7cfa",
 borderRadius:"20px"
 }}></div>
 </div>
 
-<p>Urinary</p>
+</div>
+
+
+{/* Urinary */}
+
+<div>
 
 <div style={{
-height:"18px",
+display:"flex",
+justifyContent:"space-between",
+marginBottom:"5px"
+}}>
+<p>Urinary</p>
+<p>32%</p>
+</div>
+
+<div style={{
+height:"16px",
 background:"#2a2f45",
 borderRadius:"20px"
 }}>
 <div style={{
-width:"30%",
+width:"32%",
 height:"100%",
 background:"#8e94a8",
 borderRadius:"20px"
 }}></div>
+</div>
+
 </div>
 
 </div>
@@ -112,8 +144,12 @@ borderRadius:"20px"
 <div style={{
 background:"#1e1e2f",
 padding:"30px",
-borderRadius:"20px"
+borderRadius:"20px",
+maxWidth:"900px",
+margin:"0 auto"
 }}>
+
+<div style={{height:"400px"}}>
 
 <Line
 data={{
@@ -134,6 +170,7 @@ tension:0.4
 ]
 }}
 options={{
+maintainAspectRatio:false,
 plugins:{
 legend:{labels:{color:"white"}}
 },
@@ -143,6 +180,8 @@ y:{ticks:{color:"white"}}
 }
 }}
 />
+
+</div>
 
 </div>
 

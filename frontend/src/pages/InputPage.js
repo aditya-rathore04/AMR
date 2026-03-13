@@ -1,74 +1,162 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function InputPage() {
+function InputPage(){
 
-  const navigate = useNavigate();
-  const [year, setYear] = useState("");
-  const [country, setCountry] = useState("");
-  const [specimen, setSpecimen] = useState("");
-  const [antibiotic, setAntibiotic] = useState("");
+const navigate = useNavigate();
 
-  return (
+const [year,setYear] = useState("");
+const [country,setCountry] = useState("");
+const [specimen,setSpecimen] = useState("Blood");
+const [antibiotic,setAntibiotic] = useState("Ciprofloxacin");
 
-    <div style={{ textAlign:"center", marginTop:"120px" }}>
+const handleSubmit = (e)=>{
+e.preventDefault();
 
-      <h1>AMR Resistance Predictor</h1>
+navigate("/dashboard",{
+state:{
+year:Number(year),
+country,
+specimen,
+antibiotic
+}
+});
 
-      <div style={{ marginTop:"40px" }}>
+};
 
-        <input
-          placeholder="Year"
-          value={year}
-          onChange={(e)=>setYear(e.target.value)}
-        />
+return(
 
-        <br/><br/>
+<div style={{
+background:"#0f1117",
+minHeight:"100vh",
+display:"flex",
+justifyContent:"center",
+alignItems:"center",
+color:"white"
+}}>
 
-        <input
-          placeholder="Country"
-          value={country}
-          onChange={(e)=>setCountry(e.target.value)}
-        />
+<div style={{
+background:"#1e1e2f",
+padding:"50px",
+borderRadius:"20px",
+width:"400px",
+boxShadow:"0 15px 40px rgba(0,0,0,0.45)"
+}}>
 
-        <br/><br/>
+<h1 style={{
+textAlign:"center",
+marginBottom:"35px"
+}}>
+AMR Resistance Predictor
+</h1>
 
-        <input
-          placeholder="Specimen Type"
-          value={specimen}
-          onChange={(e)=>setSpecimen(e.target.value)}
-        />
+<form
+onSubmit={handleSubmit}
+style={{
+display:"flex",
+flexDirection:"column",
+gap:"18px"
+}}
+>
 
-        <br/><br/>
+{/* YEAR */}
 
-        <input
-          placeholder="Antibiotic"
-          value={antibiotic}
-          onChange={(e)=>setAntibiotic(e.target.value)}
-        />
+<input
+type="number"
+placeholder="Year"
+value={year}
+onChange={(e)=>setYear(e.target.value)}
+required
+style={{
+padding:"12px",
+borderRadius:"10px",
+border:"none",
+background:"#2a2f45",
+color:"white"
+}}
+/>
 
-        <br/><br/>
+{/* COUNTRY */}
 
-        <button
-        onClick={() =>
-            navigate("/dashboard", {
-            state: {
-                year,
-                country,
-                specimen,
-                antibiotic
-            }
-            })
-        }
-        >
-            Predict Resistance
-        </button>
+<input
+type="text"
+placeholder="Country"
+value={country}
+onChange={(e)=>setCountry(e.target.value)}
+required
+style={{
+padding:"12px",
+borderRadius:"10px",
+border:"none",
+background:"#2a2f45",
+color:"white"
+}}
+/>
 
-      </div>
+{/* SPECIMEN DROPDOWN */}
 
-    </div>
+<select
+value={specimen}
+onChange={(e)=>setSpecimen(e.target.value)}
+style={{
+padding:"12px",
+borderRadius:"10px",
+border:"none",
+background:"#2a2f45",
+color:"white"
+}}
+>
 
-  );
+<option value="Blood">Blood</option>
+<option value="Urine">Urine</option>
+
+</select>
+
+{/* ANTIBIOTIC DROPDOWN */}
+
+<select
+value={antibiotic}
+onChange={(e)=>setAntibiotic(e.target.value)}
+style={{
+padding:"12px",
+borderRadius:"10px",
+border:"none",
+background:"#2a2f45",
+color:"white"
+}}
+>
+
+<option value="Ciprofloxacin">Ciprofloxacin</option>
+<option value="Levofloxacin">Levofloxacin</option>
+
+</select>
+
+{/* BUTTON */}
+
+<button
+type="submit"
+style={{
+marginTop:"10px",
+padding:"12px",
+borderRadius:"12px",
+border:"none",
+background:"#5b7cfa",
+color:"white",
+fontWeight:"bold",
+cursor:"pointer",
+fontSize:"16px"
+}}
+>
+Predict Resistance
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+);
 
 }
 

@@ -46,3 +46,6 @@
     transform:translateX(0);
   }
 }
+* {
+  font-family: 'Lilex', sans-serif;
+}

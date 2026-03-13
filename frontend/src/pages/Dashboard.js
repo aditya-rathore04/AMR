@@ -32,6 +32,28 @@ const { year, country, specimen, antibiotic } = location.state || {};
 const [prediction, setPrediction] = useState(null);
 const [trendData, setTrendData] = useState([]);
 const [showFilters, setShowFilters] = useState(false);
+const [alerts,setAlerts] = useState([]);
+
+const [filters,setFilters] = useState({
+year: year || 2025,
+country: country || "India",
+specimen: specimen || "Blood",
+antibiotic: antibiotic || "Ciprofloxacin"
+});
+
+/* Hover animation */
+
+const hoverEnter = (e)=>{
+e.currentTarget.style.transform="scale(1.03)";
+e.currentTarget.style.boxShadow="0 15px 35px rgba(0,0,0,0.45)";
+};
+
+const hoverLeave = (e)=>{
+e.currentTarget.style.transform="scale(1)";
+e.currentTarget.style.boxShadow="none";
+};
+
+/* Fetch predictions */
 
 useEffect(() => {
 
@@ -44,11 +66,11 @@ for (let y of years){
 
 const result = await predictResistance({
 Year: y,
-CountryTerritoryArea: country,
-Specimen: specimen,
-AntibioticName: antibiotic,
-InterpretableAST: 200,
-PrevResistance: 30
+CountryTerritoryArea: filters.country,
+Specimen: filters.specimen,
+AntibioticName: filters.antibiotic,
+InterpretableAST: 150 + Math.random()*100,
+PrevResistance: 20 + Math.random()*20
 });
 
 predictions.push(result.predicted_resistance);
@@ -62,15 +84,34 @@ setTrendData(predictions);
 
 fetchPrediction();
 
-}, [year, country, specimen, antibiotic]);
+}, [filters]);
+
+/* Fetch alerts */
+
+useEffect(()=>{
+
+fetch("http://127.0.0.1:8000/alerts")
+.then(res=>res.json())
+.then(data=>{
+setAlerts(data);
+});
+
+},[]);
 
 return (
 
 <div style={{
-padding: "40px",
-background: "#0f1117",
-minHeight: "100vh",
-color: "white"
+background:"#0f1117",
+minHeight:"100vh",
+display:"flex",
+justifyContent:"center",
+color:"white"
+}}>
+
+<div style={{
+width:"100%",
+maxWidth:"1400px",
+padding:"40px"
 }}>
 
 {/* HEADER */}
@@ -79,10 +120,10 @@ color: "white"
 
 <h1>AMR Forecasting Dashboard</h1>
 
-<div style={{display:"flex", alignItems:"center", gap:"10px", marginTop:"15px"}}>
+<div style={{display:"flex",alignItems:"center",gap:"10px",marginTop:"15px"}}>
 
 <button
-onClick={() => setShowFilters(!showFilters)}
+onClick={()=>setShowFilters(!showFilters)}
 style={{
 padding:"10px 18px",
 borderRadius:"20px",
@@ -91,52 +132,54 @@ background:"#5b7cfa",
 color:"white",
 cursor:"pointer"
 }}
-
 >
-
-Filter </button>
+Filter
+</button>
 
 {showFilters && (
 
-<div style={{
-display:"flex",
-gap:"10px",
-animation:"slideIn 0.3s ease"
-}}>
+<div style={{display:"flex",gap:"10px"}}>
 
-<select style={{padding:"8px", borderRadius:"10px"}}>
-
-<option>Region</option>
+<select
+value={filters.country}
+onChange={(e)=>setFilters({...filters,country:e.target.value})}
+style={{padding:"8px",borderRadius:"10px"}}
+>
+<option value="India">India</option>
+<option value="USA">USA</option>
+<option value="Brazil">Brazil</option>
 </select>
 
-<select style={{padding:"8px", borderRadius:"10px"}}>
-
-<option>Country</option>
+<select
+value={filters.specimen}
+onChange={(e)=>setFilters({...filters,specimen:e.target.value})}
+style={{padding:"8px",borderRadius:"10px"}}
+>
+<option value="Blood">Blood</option>
+<option value="Urine">Urine</option>
 </select>
 
-<select style={{padding:"8px", borderRadius:"10px"}}>
-
-<option>Specimen</option>
+<select
+value={filters.antibiotic}
+onChange={(e)=>setFilters({...filters,antibiotic:e.target.value})}
+style={{padding:"8px",borderRadius:"10px"}}
+>
+<option value="Ciprofloxacin">Ciprofloxacin</option>
+<option value="Levofloxacin">Levofloxacin</option>
 </select>
 
-<select style={{padding:"8px", borderRadius:"10px"}}>
-
-<option>Antibiotic</option>
+<select
+value={filters.year}
+onChange={(e)=>setFilters({...filters,year:Number(e.target.value)})}
+style={{padding:"8px",borderRadius:"10px"}}
+>
+<option value="2020">2020</option>
+<option value="2021">2021</option>
+<option value="2022">2022</option>
+<option value="2023">2023</option>
+<option value="2024">2024</option>
+<option value="2025">2025</option>
 </select>
-
-<select style={{padding:"8px", borderRadius:"10px"}}>
-
-<option>Year</option>
-</select>
-
-<button style={{
-padding:"8px 16px",
-borderRadius:"10px",
-border:"none",
-background:"#5b7cfa",
-color:"white"
-}}>
-Apply </button>
 
 </div>
 
@@ -146,12 +189,13 @@ Apply </button>
 
 </div>
 
-{/* MAIN DASHBOARD GRID */}
+{/* DASHBOARD GRID */}
 
 <div style={{
 display:"grid",
 gridTemplateColumns:"1fr 2fr 1fr",
-gap:"20px"
+gap:"20px",
+alignItems:"stretch"
 }}>
 
 {/* LEFT COLUMN */}
@@ -164,18 +208,54 @@ gap:"20px"
 
 {/* ALERT CARD */}
 
-<div style={{
-padding:"20px",
+<div
+onMouseEnter={hoverEnter}
+onMouseLeave={hoverLeave}
+style={{
+padding:"22px",
 borderRadius:"16px",
-background:"#1e1e2f"
+background:"#1e1e2f",
+transition:"all 0.2s"
+}}
+>
+
+<h3 style={{opacity:0.8}}>Emerging Resistance Alerts</h3>
+
+{alerts.length===0 ? (
+<p style={{opacity:0.6}}>No significant resistance spikes detected.</p>
+) : (
+
+alerts.map((alert,index)=>(
+
+<div key={index} style={{marginTop:"10px"}}>
+
+<div style={{
+display:"flex",
+alignItems:"center",
+gap:"10px",
+fontSize:"20px",
+fontWeight:"600"
 }}>
 
-<h3>Emerging Resistance Alert</h3>
+<span style={{fontSize:"22px"}}>⚠</span>
+<span>Alert</span>
 
-<p>
-Monitoring fluoroquinolone resistance
-trends for early warning signals.
+</div>
+
+<p style={{marginTop:"10px",lineHeight:"1.5",opacity:0.85}}>
+Fluoroquinolone resistance predicted to exceed
+<b> 35% by {alert.year}</b>.
 </p>
+
+<p style={{marginTop:"6px"}}>
+Projected increase: <b>+{alert.increase}%</b>
+</p>
+
+</div>
+
+))
+
+)}
 
 </div>
 
@@ -183,20 +263,21 @@ trends for early warning signals.
 
 <div
 onClick={()=>navigate("/map-analysis")}
+onMouseEnter={hoverEnter}
+onMouseLeave={hoverLeave}
 style={{
 padding:"20px",
 borderRadius:"16px",
 background:"#1e1e2f",
-cursor:"pointer"
+cursor:"pointer",
+transition:"all 0.2s"
 }}
 >
 
 <h3>Global Resistance Overview</h3>
 
 <div style={{marginTop:"15px"}}>
-
 <ResistanceMap/>
-
 </div>
 
 <p style={{
@@ -214,18 +295,16 @@ Click to explore global resistance trends
 {/* CENTER COLUMN */}
 
 <div
-onClick={() =>
-navigate("/prediction-analysis", {
-state:{ year, country, specimen, antibiotic }
-})
-}
+onClick={()=>navigate("/prediction-analysis",{state:{...filters}})}
+onMouseEnter={hoverEnter}
+onMouseLeave={hoverLeave}
 style={{
 padding:"40px",
 borderRadius:"20px",
 background:"#1e1e2f",
 textAlign:"center",
 cursor:"pointer",
-transition:"transform 0.2s"
+transition:"all 0.2s"
 }}
 >
 
@@ -242,20 +321,16 @@ transition:"transform 0.2s"
 <Line
 data={{
 labels:["2016","2017","2018","2019","2020","2021","2022","2023","2024","2025"],
-datasets:[
-{
+datasets:[{
 label:"Resistance %",
-data: trendData,
+data:trendData,
 borderColor:"#5b7cfa",
 backgroundColor:"rgba(91,124,250,0.2)",
 tension:0.4
-}
-]
+}]
 }}
 options={{
-plugins:{
-legend:{display:false}
-},
+plugins:{legend:{display:false}},
 scales:{
 x:{ticks:{color:"white"}},
 y:{ticks:{color:"white"}}
@@ -272,18 +347,23 @@ y:{ticks:{color:"white"}}
 <div style={{
 display:"flex",
 flexDirection:"column",
-gap:"20px"
+gap:"20px",
+height:"100%"
 }}>
 
 {/* SPECIMEN CARD */}
 
 <div
 onClick={()=>navigate("/specimen-analysis")}
+onMouseEnter={hoverEnter}
+onMouseLeave={hoverLeave}
 style={{
 padding:"20px",
 borderRadius:"16px",
 background:"#1e1e2f",
-cursor:"pointer"
+cursor:"pointer",
+transition:"all 0.2s",
+flex:1
 }}
 >
 
@@ -291,26 +371,16 @@ cursor:"pointer"
 
 <div style={{marginTop:"15px"}}>
 
-<p>Bloodstream</p>
+<p style={{fontSize:"13px"}}>Bloodstream</p>
 
-<div style={{height:"10px", background:"#2a2f45", borderRadius:"10px", marginBottom:"10px"}}>
-<div style={{
-width:"36%",
-height:"100%",
-background:"#5b7cfa",
-borderRadius:"10px"
-}}></div>
+<div style={{height:"8px",background:"#2a2f45",borderRadius:"10px",marginBottom:"8px"}}>
+<div style={{width:"36%",height:"100%",background:"#5b7cfa",borderRadius:"10px"}}></div>
 </div>
 
-<p>Urinary</p>
+<p style={{fontSize:"13px"}}>Urinary</p>
 
-<div style={{height:"10px", background:"#2a2f45", borderRadius:"10px"}}>
-<div style={{
-width:"30%",
-height:"100%",
-background:"#8e94a8",
-borderRadius:"10px"
-}}></div>
+<div style={{height:"8px",background:"#2a2f45",borderRadius:"10px"}}>
+<div style={{width:"30%",height:"100%",background:"#8e94a8",borderRadius:"10px"}}></div>
 </div>
 
 </div>
@@ -321,11 +391,15 @@ borderRadius:"10px"
 
 <div
 onClick={()=>navigate("/antibiotic-analysis")}
+onMouseEnter={hoverEnter}
+onMouseLeave={hoverLeave}
 style={{
 padding:"20px",
 borderRadius:"16px",
 background:"#1e1e2f",
-cursor:"pointer"
+cursor:"pointer",
+transition:"all 0.2s",
+flex:1
 }}
 >
 
@@ -333,26 +407,18 @@ cursor:"pointer"
 
 <div style={{marginTop:"15px"}}>
 
-<p>Ciprofloxacin</p>
+<p style={{fontSize:"13px"}}>Ciprofloxacin</p>
 
-<div style={{height:"10px", background:"#2a2f45", borderRadius:"10px", marginBottom:"10px"}}>
-<div style={{
-width:"32%",
-height:"100%",
-background:"#5b7cfa",
-borderRadius:"10px"
-}}></div>
+<div style={{height:"8px",background:"#2a2f45",borderRadius:"10px",marginBottom:"8px"}}>
+<div style={{width:"32%",height:"100%",background:"#5b7cfa",borderRadius:"10px"}}></div>
 </div>
 
-<p>Levofloxacin</p>
+<p style={{fontSize:"13px"}}>Levofloxacin</p>
 
-<div style={{height:"10px", background:"#2a2f45", borderRadius:"10px"}}>
-<div style={{
-width:"29%",
-height:"100%",
-background:"#8e94a8",
-borderRadius:"10px"
-}}></div>
+<div style={{height:"8px",background:"#2a2f45",borderRadius:"10px"}}>
+<div style={{width:"29%",height:"100%",background:"#8e94a8",borderRadius:"10px"}}></div>
+</div>
+
 </div>
 
 </div>

@@ -54,3 +54,31 @@ def get_map_data():
         result[row["CountryTerritoryArea"]] = float(round(row["ResistancePercentage"],2))
 
     return result
+@app.get("/alerts")
+def emerging_alerts():
+
+    import pandas as pd
+
+    df = pd.read_excel("../data/Glass_AMR_dataset.xlsx")
+
+    # calculate average resistance per year
+    yearly = (
+        df.groupby("Year")["ResistancePercentage"]
+        .mean()
+        .reset_index()
+    )
+
+    alerts = []
+
+    for i in range(1,len(yearly)):
+
+        change = yearly.iloc[i]["ResistancePercentage"] - yearly.iloc[i-1]["ResistancePercentage"]
+
+        if change > 2:  # threshold for alert
+
+            alerts.append({
+                "year": int(yearly.iloc[i]["Year"]),
+                "increase": round(change,2)
+            })
+
+    return alerts
